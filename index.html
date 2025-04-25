@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backrooms Worm Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f7f1c6;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .story {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="story" id="story"></div>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const storyDiv = document.getElementById('story');
+
+        const worm = {
+            body: [{ x: 10, y: 10 }],
+            direction: { x: 1, y: 0 },
+            grow: false
+        };
+
+        const fruit = { x: 15, y: 15 };
+        const gridSize = 20;
+        const storyFragments = [
+            "Recuerdos fugaces de una infancia perdida...",
+            "Una decisión tomada en un momento de ira...",
+            "El peso de las palabras nunca dichas...",
+            "Un rostro olvidado, pero una culpa persistente...",
+            "El eco de una risa que ya no existe...",
+            "Un error que no puede deshacerse...",
+            "La soledad de un cuarto vacío...",
+            "El zumbido de las luces, como un juicio constante...",
+            "Un laberinto que refleja mi mente...",
+            "Cada paso me lleva más lejos de la redención...",
+            "El arrepentimiento es un veneno lento...",
+            "No hay escapatoria de uno mismo...",
+            "Los muros se cierran, como mis opciones...",
+            "El tiempo no cura, solo entierra más profundo...",
+            "Un grito ahogado en la oscuridad...",
+            "La desesperación es mi única compañía...",
+            "El perdón es un sueño inalcanzable...",
+            "Cada fruta, un recuerdo más doloroso...",
+            "El laberinto es infinito, como mi culpa...",
+            "La luz al final es solo una ilusión...",
+            "El peso de mis errores me aplasta...",
+            "No hay redención para los condenados...",
+            "El final está cerca, pero no hay alivio...",
+            "La última fruta, el último recuerdo...",
+            "El silencio eterno es mi única salida..."
+        ];
+
+        let currentStoryIndex = 0;
+
+        function drawWorm() {
+            ctx.fillStyle = 'green';
+            worm.body.forEach(segment => {
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            });
+        }
+
+        function drawFruit() {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(fruit.x * gridSize, fruit.y * gridSize, gridSize, gridSize);
+        }
+
+        function moveWorm() {
+            const head = { x: worm.body[0].x + worm.direction.x, y: worm.body[0].y + worm.direction.y };
+            worm.body.unshift(head);
+            if (!worm.grow) {
+                worm.body.pop();
+            } else {
+                worm.grow = false;
+            }
+        }
+
+        function checkCollision() {
+            const head = worm.body[0];
+            if (head.x === fruit.x && head.y === fruit.y) {
+                worm.grow = true;
+                fruit.x = Math.floor(Math.random() * (canvas.width / gridSize));
+                fruit.y = Math.floor(Math.random() * (canvas.height / gridSize));
+                if (currentStoryIndex < storyFragments.length) {
+                    storyDiv.textContent = storyFragments[currentStoryIndex];
+                    currentStoryIndex++;
+                }
+            }
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawWorm();
+            drawFruit();
+            moveWorm();
+            checkCollision();
+            setTimeout(gameLoop, 200);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (worm.direction.y === 0) worm.direction = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    if (worm.direction.y === 0) worm.direction = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    if (worm.direction.x === 0) worm.direction = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (worm.direction.x === 0) worm.direction = { x: 1, y: 0 };
+                    break;
+            }
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>
